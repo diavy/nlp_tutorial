@@ -6,7 +6,7 @@ input_file = 'word2vec/wiki.txt'
 out_file = 'word2vec/wiki.model'
 
 model = Word2Vec(LineSentence(input_file),
-                 size=100,
+                 vector_size=100,
                  window=5,
                  min_count=5,
                  workers=multiprocessing.cpu_count(),

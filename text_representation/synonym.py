@@ -1,7 +1,7 @@
 import numpy as np
 import gensim
 
-model = gensim.models.Word2Vec.load('word2vec/wiki.ptm')
+model = gensim.models.Word2Vec.load('word2vec/wiki.model')
 embedding = model.wv
 
 
@@ -13,7 +13,7 @@ def search(word, topk=3):
     we = embedding[word]
     similarity = cosine(we, embedding.vectors)
     index = np.argsort(-similarity)
-    w = np.array(embedding.index2word)[index[0:topk]]
+    w = np.array(embedding.index_to_key)[index[0:topk]]
     print(w)
 
 
