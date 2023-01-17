@@ -8,6 +8,7 @@ from sklearn.metrics import accuracy_score
 from utils import fix_seed
 
 
+###### Part1: 模型定义 ########
 class TextCLS(torch.nn.Module):
     # 准备我们需要用到的参数和layer
     def __init__(self,
@@ -28,11 +29,11 @@ class TextCLS(torch.nn.Module):
         embedding = self.embedding(x)
         # [batch_size, seq_len, hidden_size]
         out, _ = self.lstm(embedding)
-        out = self.dense1(out[:, -1, :])
+        out = self.dense1(out[:, -1, :]) #取最上面一层最后一个时刻的h_t
         out = self.dense2(out)
         return out
 
-
+###### Part2: 数据准备 ##########
 def tokenize(string):
     res = list(jieba.cut(string, cut_all=False))
     return res
@@ -54,6 +55,7 @@ def padding_seq(X, max_len=10):
     ])
 
 
+# 读取文本转化为训练数据格式
 def load_data(batch_size=32):
     train_text = []
     train_label = []
@@ -100,7 +102,7 @@ def load_data(batch_size=32):
     return train_data_loader, dev_data_loader, vocab
 
 
-# 训练模型
+###### Part3: 模型训练 ##########
 def train():
     fix_seed()
 
@@ -111,7 +113,7 @@ def train():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     loss_func = nn.CrossEntropyLoss()
 
-    if torch.cuda.is_available():
+    if torch.cuda.is_available():#使用GPU
         model = model.cuda()
 
     for epoch in range(5):
