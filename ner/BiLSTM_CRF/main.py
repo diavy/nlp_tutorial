@@ -13,7 +13,7 @@ from utils import get_tags, format_result
 
 
 class NERDataset(Dataset):
-    def __init__(self, X, Y, *args, **kwargs):
+    def __init__(self, X, Y):
         self.data = [{'x':X[i],'y':Y[i]} for i in range(X.shape[0])]
 
     def __getitem__(self, index):
