@@ -4,14 +4,14 @@ import torch.nn as nn
 
 class DSSM(nn.Module):
     def __init__(self,
-                 char_vocab_size,
-                 char_dim=100,
+                 vocab_size,
+                 embedding_size=100,
                  hidden_size=128):
         super(DSSM, self).__init__()
 
-        self.char_embedding = nn.Embedding(char_vocab_size, char_dim)
+        self.char_embedding = nn.Embedding(vocab_size, embedding_size)
 
-        self.fc1 = nn.Linear(100, hidden_size)
+        self.fc1 = nn.Linear(embedding_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
 
         self.dropout = nn.Dropout(0.2)

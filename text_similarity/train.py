@@ -54,13 +54,13 @@ def load_data(batch_size=32):
 def train():
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     train_data_loader, dev_data_loader, vocab = load_data(32)
-    model = ESIM(vocab_size=len(vocab),
-                 embedding_size=100,
-                 hidden_size=128,
-                 max_len=10)
-    # model = DSSM(vocab_len=len(vocab),
+    # model = ESIM(vocab_size=len(vocab),
     #              embedding_size=100,
-    #              hidden_size=128)
+    #              hidden_size=128,
+    #              max_len=10)
+    model = DSSM(vocab_size=len(vocab),
+                 embedding_size=100,
+                 hidden_size=128)
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     # loss_func = nn.BCELoss()
