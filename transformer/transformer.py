@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 class SelfAttention(nn.Module):
     def __init__(self, hidden_size):
         super(SelfAttention, self).__init__()
@@ -34,7 +35,8 @@ class SelfAttention(nn.Module):
         QK_prod = torch.einsum('bqh,bkh->bqk', query, key)
         # word similarities
         if mask is not None:
-            QK_prod = QK_prod.masked_fill(mask == 0, float('-1e20'))
+            #QK_prod = QK_prod.masked_fill(mask == 0, float('-1e20'))
+            QK_prod = QK_prod + mask
         attention = torch.softmax(QK_prod / (self.hidden_size ** 0.5), dim = 2)
         # attention,[batch_size, query_length, key_length]
         output = torch.einsum('bqk,bkh->bqh', attention, value)
@@ -71,6 +73,7 @@ class TransformerBlock(nn.Module):
         block_output = self.dropout(self.norm2(forward + output))
         return block_output
 
+
 class Encoder(nn.Module):
     def __init__(
             self,
@@ -98,6 +101,7 @@ class Encoder(nn.Module):
                 mask = mask
             )
         return hidden_inputs
+
 
 class DecoderBlock(nn.Module):
     def __init__(
@@ -130,6 +134,7 @@ class DecoderBlock(nn.Module):
         )
         return decoder_block_output
 
+
 class Decoder(nn.Module):
     def __init__(
             self,
@@ -159,6 +164,7 @@ class Decoder(nn.Module):
             )
         output = self.fc(decoder_hidden_input)
         return output
+
 
 class Transformer(nn.Module):
     def __init__(
@@ -190,16 +196,17 @@ class Transformer(nn.Module):
     def forward(self, encoder_input_ids, decoder_input_ids):
         decoder_seqlen = decoder_input_ids.shape[1]
         mask = generate_square_subsequent_mask(s = decoder_seqlen)
+        print(mask)
         encoder_output = self.encoder(encoder_input_ids)
         out = self.decoder(decoder_input_ids, encoder_output, mask)
         # batch_size, seq_len, vocab_size
         return out
 
+
 def generate_square_subsequent_mask(s):
     mask = torch.tril(torch.ones(s, s))
     mask = torch.where(
         mask == 1.0,
-        #float(0.0),
         torch.Tensor([0.0]),
         torch.Tensor([float('-inf')])
     )
