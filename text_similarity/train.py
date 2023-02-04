@@ -1,13 +1,13 @@
-import torch
 from torch import nn
 from collections import defaultdict
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import accuracy_score
-from text_similarity.esim2 import ESIM
+from text_similarity.esim import ESIM
 from text_similarity.dssm import DSSM
 from utils import *
 import pandas as pd
 from tqdm import tqdm
+import sys
 
 
 def load_data(batch_size=32):
@@ -51,20 +51,28 @@ def load_data(batch_size=32):
 
 
 # 训练模型
-def train():
+def train(model_type='dssm'):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     train_data_loader, dev_data_loader, vocab = load_data(32)
-    # model = ESIM(vocab_size=len(vocab),
-    #              embedding_size=100,
-    #              hidden_size=128,
-    #              max_len=10)
-    model = DSSM(vocab_size=len(vocab),
+
+    if model_type == 'dssm':
+        model = DSSM(vocab_size=len(vocab),
                  embedding_size=100,
                  hidden_size=128)
+    elif model_type == 'esim':
+        model = ESIM(vocab_size=len(vocab),
+                     embedding_size=100,
+                     hidden_size=128,
+                     max_len=10)
+    else:
+        sys.exit('Model unknown')
     model = model.to(device)
+
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-    # loss_func = nn.BCELoss()
-    loss_func = nn.CrossEntropyLoss()
+    if model_type == 'dssm':
+        loss_func = nn.BCELoss()
+    else:
+        loss_func = nn.CrossEntropyLoss()
 
     for epoch in range(5):
         pred = []
@@ -76,10 +84,15 @@ def train():
 
             # 前向传播
             output = model(x1.long(), x2.long())
+            if model_type == 'dssm':
+                y = y.float()
             loss = loss_func(output, y)
             optimizer.zero_grad()
 
-            pred.extend(torch.argmax(output.detach().cpu(), dim=1).numpy())
+            if model_type == 'dssm':
+                pred.extend((output.cpu().data.numpy() > 0.5).astype(int))
+            else:
+                pred.extend(torch.argmax(output.detach().cpu(), dim=1).numpy())
             label.extend(y.cpu().numpy())
 
             # 反向传播
@@ -97,11 +110,16 @@ def train():
             y = y.to(device)
             with torch.no_grad():
                 output = model(x1.long(), x2.long())
-            pred.extend(torch.argmax(output.detach().cpu(), dim=1).numpy())
+            if model_type == 'dssm':
+                pred.extend((output.cpu().data.numpy() > 0.5).astype(int))
+            else:
+                pred.extend(torch.argmax(output.detach().cpu(), dim=1).numpy())
             label.extend(y.cpu().numpy())
         acc = accuracy_score(pred, label)
         print('dev acc:', acc)
 
 
 if __name__ == '__main__':
-    train()
+    model_type = 'esim'
+    train(model_type)
+    # ESIM模型效果明显好于DSSM，因为ESIM使用了LSTM+Attention机制，考虑了word与word之间的交互
