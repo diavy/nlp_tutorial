@@ -1,12 +1,18 @@
 from sklearn.metrics import accuracy_score
-from transformers import BertForSequenceClassification, BertTokenizer
+from transformers import BertForSequenceClassification, BertTokenizer, RobertaTokenizer
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from utils import fix_seed
-from annlp import ptm_path
+#from annlp import ptm_path
 import torch
 
-path = ptm_path('roberta')
+# path = ptm_path('roberta')
+# tokenizer = BertTokenizer.from_pretrained(path)
+
+# path = 'roberta-base'
+# tokenizer = RobertaTokenizer.from_pretrained(path)
+
+path = "bert-base-uncased"
 tokenizer = BertTokenizer.from_pretrained(path)
 
 
@@ -68,7 +74,7 @@ def load_data(batch_size=32):
 
 
 # 训练模型
-def train():
+def train(num_epochs):
     fix_seed()
 
     train_data_loader, dev_data_loader = load_data(128)
@@ -77,7 +83,7 @@ def train():
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=5e-5)
 
-    for epoch in range(5):
+    for epoch in range(num_epochs):
         print('epoch:', epoch + 1)
         pred = []
         label = []
@@ -121,4 +127,5 @@ def train():
 
 
 if __name__ == '__main__':
-    train()
+    num_epochs = 10
+    train(num_epochs)
