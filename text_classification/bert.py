@@ -127,5 +127,5 @@ def train(num_epochs):
 
 
 if __name__ == '__main__':
-    num_epochs = 10
+    num_epochs = 5
     train(num_epochs)
