@@ -3,18 +3,18 @@ import torch
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--bert_path', help='config file', default='/home/data/tmp/bert-base-chinese')
-parser.add_argument('--save_path', help='training file', default='/home/data/tmp/NLP_Course/TextBERT/train')
-parser.add_argument('--train_file', help='training file', default='/home/data/tmp/NLP_Course/TextBERT/data/train')
-parser.add_argument('--valid_file', help='valid file', default='/home/data/tmp/NLP_Course/TextBERT/data/test')
-parser.add_argument('--label_vocab', help='training file', default='/home/data/tmp/NLP_Course/TextBERT/data/label_vocab')
+parser.add_argument('--bert_path', help='config file', default='bert-base-chinese')
+parser.add_argument('--save_path', help='training file', default='model')
+parser.add_argument('--train_file', help='training file', default='data/train')
+parser.add_argument('--valid_file', help='valid file', default='data/test')
+parser.add_argument('--label_vocab', help='training file', default='data/label_vocab')
 
 parser.add_argument('--lr', type=float, default=8e-6)
 parser.add_argument('--lr_warmup', type=float, default=200)
 parser.add_argument('--bs', type=int, default=70)
 parser.add_argument('--batch_split', type=int, default=3)
 parser.add_argument('--eval_steps', type=int, default=100)
-parser.add_argument('--n_epochs', type=int, default=30)
+parser.add_argument('--n_epochs', type=int, default=3) ###default is original set to 30
 parser.add_argument('--max_length', type=int, default=90)
 parser.add_argument('--n_jobs', type=int, default=1, help='num of workers to process data')
 
@@ -22,8 +22,10 @@ parser.add_argument('--gpu', help='which gpu to use', type=str, default='3')
 
 args = parser.parse_args()
 
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-device = torch.device('cuda', 0)
+# os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+# device = torch.device('cuda', 0)
+
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 from transformers import BertForSequenceClassification, BertConfig, BertTokenizer
 from transformers import AdamW

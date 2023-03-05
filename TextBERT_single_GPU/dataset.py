@@ -46,11 +46,13 @@ class PadBatchSeq:
         res['mask'] = torch.LongTensor([i['mask'] + [self.pad_id] * (max_len - len(i['mask'])) for i in batch])
         return res
 
+
 if __name__ == '__main__':
     from transformers import BertTokenizer
-    bert_path = '/home/data/tmp/bert-base-chinese'
-    data_file = '/home/data/tmp/NLP_Course/TextBERT/data/test'
-    label_vocab = '/home/data/tmp/NLP_Course/TextBERT/data/label_vocab'
+    #bert_path = '/home/data/tmp/bert-base-chinese'
+    bert_path = 'bert-base-chinese'
+    data_file = 'data/test'
+    label_vocab = 'data/label_vocab'
     with open(label_vocab) as f:
         res = [i.strip() for i in f.readlines() if len(i.strip()) != 0]
     label_vocab = dict(zip(res, range(len(res))))
