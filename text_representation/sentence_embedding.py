@@ -8,7 +8,8 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 class SentenceEmbedding:
     def __init__(self):
-        model_path = 'E:\\ptm\\simbert'
+        #model_path = 'E:\\ptm\\simbert'
+        model_path = 'WangZeJun/simbert-base-chinese'
         self.model = BertModel.from_pretrained(model_path)
         self.model.to(device)
         self.model.eval()
@@ -47,3 +48,10 @@ class SentenceEmbedding:
             output = outputs[1].cpu().numpy()
 
         return output
+
+
+if __name__ == '__main__':
+    text = '这个周末天气不错，看着心情舒坦，准备和朋友户外拓展，什么保险好?'
+    SE = SentenceEmbedding()
+    res = SE.encode(text)
+    print(res)

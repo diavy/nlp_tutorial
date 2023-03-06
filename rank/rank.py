@@ -1,13 +1,18 @@
 from utils import get_device
 import torch
-from transformers import BertTokenizer
+from transformers import BertTokenizer, RobertaTokenizer
 from model import BertForNDCG
 import numpy as np
 
 device = get_device()
-model_path = 'E:\\ptm\\roberta'
+#model_path = 'E:\\ptm\\roberta'
 
+# model_path = 'roberta-base'
+# tokenizer = RobertaTokenizer.from_pretrained(model_path)
+
+model_path = 'bert-base-uncased'
 tokenizer = BertTokenizer.from_pretrained(model_path)
+
 model = BertForNDCG.from_pretrained(model_path)
 model.load_state_dict(torch.load('best_model.bin', map_location=device))
 model.to(device)

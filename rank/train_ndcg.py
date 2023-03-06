@@ -1,9 +1,9 @@
 import numpy as np
-from transformers import BertTokenizer
+from transformers import BertTokenizer, RobertaTokenizer
 from model import BertForNDCG
 import pandas as pd
 import torch
-from utils import get_device
+#from utils import get_device
 from tqdm import tqdm
 from torch.utils.data import DataLoader, Dataset
 
@@ -40,9 +40,15 @@ class BaseDataset(Dataset):
 
 
 batch_size = 20
-device = get_device()
-path = 'E:\\ptm\\roberta'
+#device = get_device()
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+# path = 'E:\\ptm\\roberta'
 # path = ptm_path('roberta')
+
+# path = 'roberta-base'
+# tokenizer = RobertaTokenizer.from_pretrained(path)
+
+path = 'bert-base-uncased'
 tokenizer = BertTokenizer.from_pretrained(path)
 model = BertForNDCG.from_pretrained(path).to(device)
 
@@ -87,7 +93,8 @@ def dev_func():
 
 opt = torch.optim.Adam(lr=5e-5, params=model.parameters())
 best_ndcg = 0
-for epoch in range(10):
+n_epochs = 10
+for epoch in range(n_epochs):
     model.train()
     pbar = tqdm(train_loader)
     for data in pbar:
